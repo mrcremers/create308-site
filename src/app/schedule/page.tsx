@@ -52,119 +52,113 @@ export default function SchedulePage() {
     <main>
       <PageHero
         title="Schedule"
-        subtitle="Browse the weekly schedule by category and day, then click any class for more information about the instructor, studio, and fit."
+        subtitle="Browse by category and day, then tap any class for details."
       />
 
       <Section className="bg-[#EFE8E3]">
-        <div className="mb-10 flex flex-col gap-6">
-          <div>
-            <p className="mb-3 text-sm uppercase tracking-[0.25em] text-[#6E5A73]">
-              Weekly Schedule
-            </p>
-            <h2 className="mb-4 text-4xl font-serif md:text-5xl">
-              Monday through Thursday
-            </h2>
-            <p className="max-w-3xl text-lg text-[#4B4B4B]">
-              Scan the week at a glance, then click any class tile to view more
-              details.
-            </p>
-          </div>
+        {/* HEADER */}
+        <div className="mb-8 sm:mb-10">
+          <p className="mb-3 text-xs uppercase tracking-[0.25em] text-[#6E5A73] sm:text-sm">
+            Weekly Schedule
+          </p>
+          <h2 className="mb-4 text-3xl font-serif sm:text-4xl md:text-5xl">
+            Monday through Thursday
+          </h2>
+          <p className="max-w-2xl text-sm sm:text-lg text-[#4B4B4B]">
+            Tap any class to view details and instructor information.
+          </p>
+        </div>
 
-          <div className="flex flex-wrap gap-3">
-            {(["dance", "theatre", "music"] as const).map((category) => {
-              const meta = categoryMeta[category];
+        {/* CATEGORY FILTER */}
+        <div className="mb-5 flex flex-wrap gap-2 sm:gap-3">
+          {(["dance", "theatre", "music"] as const).map((category) => {
+            const meta = categoryMeta[category];
+
+            return (
+              <button
+                key={category}
+                onClick={() => {
+                  setActiveCategory(category);
+                  setOpenClassId(null);
+                  if (category !== "dance") setActiveDanceStyle("all");
+                }}
+                className={`rounded-full px-4 py-2 text-xs sm:text-sm ${
+                  activeCategory === category
+                    ? "bg-[#6E5A73] text-white"
+                    : "bg-white hover:bg-[#DDD4CF]"
+                }`}
+              >
+                {meta.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* STYLE FILTER */}
+        {activeCategory === "dance" && (
+          <div className="mb-8 flex flex-wrap gap-2 sm:gap-3">
+            <button
+              onClick={() => {
+                setActiveDanceStyle("all");
+                setOpenClassId(null);
+              }}
+              className={`rounded-full px-4 py-2 text-xs sm:text-sm ${
+                activeDanceStyle === "all"
+                  ? "bg-[#6E5A73] text-white"
+                  : "bg-white hover:bg-[#DDD4CF]"
+              }`}
+            >
+              All
+            </button>
+
+            {danceStyleFilters.map((style) => {
+              const styleMeta = getStyleMeta({
+                id: "",
+                day: "Monday",
+                studio: "Grey",
+                category: "dance",
+                style,
+                level: "",
+                startTime: "",
+                endTime: "",
+                instructorId: "",
+                shortDescription: "",
+                experienceNeeded: "",
+              });
 
               return (
                 <button
-                  key={category}
-                  type="button"
+                  key={style}
                   onClick={() => {
-                    setActiveCategory(category);
+                    setActiveDanceStyle(style);
                     setOpenClassId(null);
-                    if (category !== "dance") {
-                      setActiveDanceStyle("all");
-                    }
                   }}
-                  className={`rounded-full px-5 py-2.5 text-sm font-medium transition ${
-                    activeCategory === category
-                      ? "bg-[#6E5A73] text-white"
-                      : "bg-white text-[#1C1C1E] hover:bg-[#DDD4CF]"
+                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs sm:text-sm ${
+                    activeDanceStyle === style
+                      ? "bg-white shadow-sm"
+                      : "bg-white/70 hover:bg-white"
                   }`}
                 >
-                  {meta.label}
+                  <span className={`h-2.5 w-2.5 rounded-full ${styleMeta.dotClass}`} />
+                  {style}
                 </button>
               );
             })}
           </div>
+        )}
 
-          {activeCategory === "dance" && (
-            <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveDanceStyle("all");
-                  setOpenClassId(null);
-                }}
-                className={`rounded-full px-4 py-2 text-sm transition ${
-                  activeDanceStyle === "all"
-                    ? "bg-[#6E5A73] text-white"
-                    : "bg-white text-[#1C1C1E] hover:bg-[#DDD4CF]"
-                }`}
-              >
-                View All
-              </button>
-
-              {danceStyleFilters.map((style) => {
-                const styleMeta = getStyleMeta({
-                  id: "",
-                  day: "Monday",
-                  studio: "Grey",
-                  category: "dance",
-                  style,
-                  level: "",
-                  startTime: "",
-                  endTime: "",
-                  instructorId: "",
-                  shortDescription: "",
-                  experienceNeeded: "",
-                });
-
-                return (
-                  <button
-                    key={style}
-                    type="button"
-                    onClick={() => {
-                      setActiveDanceStyle(style);
-                      setOpenClassId(null);
-                    }}
-                    className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm transition ${
-                      activeDanceStyle === style
-                        ? "bg-white text-[#1C1C1E] shadow-sm"
-                        : "bg-white/70 text-[#1C1C1E] hover:bg-white"
-                    }`}
-                  >
-                    <span
-                      className={`h-3 w-3 rounded-full ${styleMeta.dotClass}`}
-                    />
-                    <span>{style}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        <div className="hidden gap-6 lg:grid lg:grid-cols-4">
+        {/* MOBILE + DESKTOP SHARED STRUCTURE */}
+        <div className="space-y-6 lg:grid lg:grid-cols-4 lg:gap-6 lg:space-y-0">
           {scheduleDays.map((day) => (
-            <div key={day} className="rounded-[28px] bg-[#F7F6F4] p-4">
-              <div className="mb-4 border-b border-black/10 pb-4 text-center">
-                <h3 className="text-3xl font-serif">{day}</h3>
+            <div key={day} className="rounded-[24px] bg-[#F7F6F4] p-4">
+              <div className="mb-3 border-b border-black/10 pb-3">
+                <h3 className="text-xl sm:text-2xl font-serif">{day}</h3>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {classesByDay[day].length === 0 ? (
-                  <div className="rounded-[24px] bg-white px-4 py-5 text-sm text-[#4B4B4B] shadow-sm">
-                    No classes shown for this day.
+                  <div className="rounded-[20px] bg-white px-4 py-4 text-sm text-[#4B4B4B]">
+                    No classes.
                   </div>
                 ) : (
                   classesByDay[day].map((item) => {
@@ -176,49 +170,33 @@ export default function SchedulePage() {
                     return (
                       <div
                         key={item.id}
-                        className={`overflow-hidden rounded-[24px] bg-white shadow-sm transition ${
+                        className={`rounded-[20px] bg-white ${
                           isOpen ? "ring-1 ring-[#C47A7A]/30" : ""
                         }`}
                       >
                         <button
-                          type="button"
                           onClick={() =>
                             setOpenClassId(isOpen ? null : item.id)
                           }
-                          className={`w-full cursor-pointer rounded-[24px] border-l-[3px] bg-white px-4 py-4 text-left transition hover:-translate-y-[2px] hover:shadow-md ${styleMeta.accent}`}
+                          className={`w-full text-left px-4 py-3 border-l-[3px] ${styleMeta.accent}`}
                         >
-                          <div className="mb-2">
-                            <h4 className="text-xl font-serif leading-tight text-[#1C1C1E]">
-                              {formatClosedTitle(item)}
-                            </h4>
+                          <h4 className="text-base sm:text-lg font-serif">
+                            {formatClosedTitle(item)}
+                          </h4>
+
+                          <div className="flex justify-between mt-1 text-xs sm:text-sm text-[#4B4B4B]">
+                            <span>{formatTime(item)}</span>
+                            <span>{isOpen ? "−" : "+"}</span>
                           </div>
-
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-[#4B4B4B]">
-                              {formatTime(item)}
-                            </p>
-
-                            <span className="text-xs font-medium text-[#6E5A73]">
-                              {isOpen ? "−" : "+"}
-                            </span>
-                          </div>
-
-                          <p className="mt-2 text-xs text-[#6E5A73]">
-                            {isOpen ? "Hide details" : "View details"}
-                          </p>
                         </button>
 
                         {isOpen && (
-                          <div className="space-y-4 px-4 pb-4 pt-3">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span
-                                className={`rounded-full px-3 py-1 text-xs uppercase tracking-wide ${styleMeta.chipClass}`}
-                              >
+                          <div className="px-4 pb-4 pt-2 space-y-3">
+                            <div className="flex flex-wrap gap-2 text-xs">
+                              <span className={`px-3 py-1 rounded-full ${styleMeta.chipClass}`}>
                                 {item.style}
                               </span>
-                              <span
-                                className={`rounded-full bg-[#F7F6F4] px-3 py-1 text-xs uppercase tracking-wide ${studioInfo.textClass}`}
-                              >
+                              <span className="px-3 py-1 rounded-full bg-[#F7F6F4]">
                                 {studioInfo.label}
                               </span>
                             </div>
@@ -227,149 +205,33 @@ export default function SchedulePage() {
                               <div className="flex items-center gap-3">
                                 <img
                                   src={instructor.image}
-                                  alt={instructor.name}
-                                  className="h-14 w-14 rounded-2xl object-cover"
+                                  className="h-12 w-12 rounded-xl object-cover"
                                 />
                                 <div>
-                                  <p className="text-base font-medium text-[#1C1C1E]">
+                                  <p className="text-sm font-medium">
                                     {instructor.name}
                                   </p>
-                                  <p className="text-sm text-[#4B4B4B]">
+                                  <p className="text-xs text-[#4B4B4B]">
                                     {instructor.role}
                                   </p>
                                 </div>
                               </div>
                             )}
 
-                            <p className="text-sm leading-6 text-[#4B4B4B]">
+                            <p className="text-sm text-[#4B4B4B]">
                               {item.shortDescription}
                             </p>
 
-                            <p className="text-sm leading-6 text-[#4B4B4B]">
-                              <span className="font-medium text-[#1C1C1E]">
-                                Recommended experience:
+                            <p className="text-sm text-[#4B4B4B]">
+                              <span className="font-medium">
+                                Experience:
                               </span>{" "}
                               {item.experienceNeeded}
                             </p>
 
                             <Link
                               href="/contact"
-                              className="inline-flex rounded-full bg-[#C47A7A] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
-                            >
-                              Ask About This Class
-                            </Link>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="space-y-8 lg:hidden">
-          {scheduleDays.map((day) => (
-            <div key={day} className="rounded-[28px] bg-[#F7F6F4] p-4">
-              <div className="mb-4 border-b border-black/10 pb-4">
-                <h3 className="text-3xl font-serif">{day}</h3>
-              </div>
-
-              <div className="space-y-4">
-                {classesByDay[day].length === 0 ? (
-                  <div className="rounded-[24px] bg-white px-4 py-5 text-sm text-[#4B4B4B] shadow-sm">
-                    No classes shown for this day.
-                  </div>
-                ) : (
-                  classesByDay[day].map((item) => {
-                    const isOpen = openClassId === item.id;
-                    const instructor = getInstructorBySlug(item.instructorId);
-                    const studioInfo = studioMeta[item.studio];
-                    const styleMeta = getStyleMeta(item);
-
-                    return (
-                      <div
-                        key={item.id}
-                        className={`overflow-hidden rounded-[24px] bg-white shadow-sm transition ${
-                          isOpen ? "ring-1 ring-[#C47A7A]/30" : ""
-                        }`}
-                      >
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setOpenClassId(isOpen ? null : item.id)
-                          }
-                          className={`w-full cursor-pointer rounded-[24px] border-l-[3px] bg-white px-4 py-4 text-left transition hover:-translate-y-[2px] hover:shadow-md ${styleMeta.accent}`}
-                        >
-                          <div className="mb-2">
-                            <h4 className="text-xl font-serif leading-tight text-[#1C1C1E]">
-                              {formatClosedTitle(item)}
-                            </h4>
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-[#4B4B4B]">
-                              {formatTime(item)}
-                            </p>
-
-                            <span className="text-xs font-medium text-[#6E5A73]">
-                              {isOpen ? "−" : "+"}
-                            </span>
-                          </div>
-
-                          <p className="mt-2 text-xs text-[#6E5A73]">
-                            {isOpen ? "Hide details" : "View details"}
-                          </p>
-                        </button>
-
-                        {isOpen && (
-                          <div className="space-y-4 px-4 pb-4 pt-3">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span
-                                className={`rounded-full px-3 py-1 text-xs uppercase tracking-wide ${styleMeta.chipClass}`}
-                              >
-                                {item.style}
-                              </span>
-                              <span
-                                className={`rounded-full bg-[#F7F6F4] px-3 py-1 text-xs uppercase tracking-wide ${studioInfo.textClass}`}
-                              >
-                                {studioInfo.label}
-                              </span>
-                            </div>
-
-                            {instructor && (
-                              <div className="flex items-center gap-3">
-                                <img
-                                  src={instructor.image}
-                                  alt={instructor.name}
-                                  className="h-14 w-14 rounded-2xl object-cover"
-                                />
-                                <div>
-                                  <p className="text-base font-medium text-[#1C1C1E]">
-                                    {instructor.name}
-                                  </p>
-                                  <p className="text-sm text-[#4B4B4B]">
-                                    {instructor.role}
-                                  </p>
-                                </div>
-                              </div>
-                            )}
-
-                            <p className="text-sm leading-6 text-[#4B4B4B]">
-                              {item.shortDescription}
-                            </p>
-
-                            <p className="text-sm leading-6 text-[#4B4B4B]">
-                              <span className="font-medium text-[#1C1C1E]">
-                                Recommended experience:
-                              </span>{" "}
-                              {item.experienceNeeded}
-                            </p>
-
-                            <Link
-                              href="/contact"
-                              className="inline-flex rounded-full bg-[#C47A7A] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+                              className="block text-center rounded-full bg-[#C47A7A] px-4 py-2 text-sm text-white"
                             >
                               Ask About This Class
                             </Link>
@@ -385,33 +247,28 @@ export default function SchedulePage() {
         </div>
       </Section>
 
+      {/* CTA */}
       <Section>
-        <div className="mx-auto max-w-4xl text-center">
-          <p className="mb-3 text-sm uppercase tracking-[0.25em] text-[#6E5A73]">
-            Need Help Choosing?
-          </p>
-
-          <h2 className="mb-6 text-4xl font-serif md:text-5xl">
-            We can help with placement and fit
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="mb-5 text-3xl sm:text-4xl md:text-5xl font-serif">
+            Need help choosing?
           </h2>
 
-          <p className="mb-8 text-lg leading-8 text-[#4B4B4B]">
-            If you are unsure which class level or style is right for your
-            student, reach out. We can help guide you toward a confident
-            starting point.
+          <p className="mb-6 text-sm sm:text-lg text-[#4B4B4B]">
+            We can help guide you toward the right class and level.
           </p>
 
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/contact"
-              className="rounded-full bg-[#C47A7A] px-8 py-3 text-sm font-medium text-white transition hover:opacity-90"
+              className="rounded-full bg-[#C47A7A] px-6 py-3 text-white text-sm"
             >
               Contact the Studio
             </Link>
 
             <Link
               href="/programs"
-              className="rounded-full border border-[#1C1C1E]/15 px-8 py-3 text-sm font-medium text-[#1C1C1E] transition hover:bg-white"
+              className="rounded-full border px-6 py-3 text-sm"
             >
               Explore Programs
             </Link>
